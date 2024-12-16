@@ -1,5 +1,4 @@
 
-
 ```markdown
 # Kenyan Dog Marketplace API
 
@@ -14,12 +13,19 @@ This API allows users to create, read, and search for dog listings, with detaile
 - **Create Dog Listings**: Users can create new dog listings with details such as breed, price, age, and location.
 - **Search Dogs**: Search for available dogs based on parameters like breed, location, price range, and distance from a specific point.
 - **User Management**: Create and manage user profiles.
-- **Geolocation Support**: Ensure that all data is within the boundaries of Kenya, with support for location-based searches.
+- **Geolocation Support**: Ensures that all data is within the boundaries of Kenya, with support for location-based searches.
 - **Data Validation**: Strong data validation ensures that users only submit valid data (e.g., valid Kenyan counties, dog breeds).
+- **Security**: Password hashing using bcrypt for secure password storage.
+- **Search Capabilities**: Ability to filter listings by breed, price, and location, with support for combined filters.
 
 ## Installation
 
-To run the API locally, follow these steps:
+### Prerequisites
+
+- **Python 3.7 or higher**
+- **pip** (Python package manager)
+
+### Local Setup
 
 1. **Clone the repository**:
 
@@ -28,7 +34,7 @@ To run the API locally, follow these steps:
    cd kenyan-dog-marketplace-fastApi
    ```
 
-2. **Create a virtual environment**:
+2. **Create and activate the virtual environment**:
 
    For Linux/MacOS:
 
@@ -50,11 +56,7 @@ To run the API locally, follow these steps:
    pip install -r requirements.txt
    ```
 
-4. **Set up the database**:
-
-   This API uses SQLite for local development. The database will be automatically created when you run the API.
-
-5. **Run the API**:
+4. **Start the server**:
 
    ```bash
    uvicorn app.main:app --reload
@@ -69,62 +71,100 @@ Once the server is running, you can access the interactive API documentation at:
 - **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - **ReDoc UI**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
 
-## Endpoints
+## Main Endpoints
 
-### Dogs Endpoints
+### Users API
 
-- **POST /api/v1/dogs/**: Create a new dog listing.
-- **GET /api/v1/dogs/**: Search for dogs. You can filter by breed, price range, location, and distance.
+- **Create User**: `POST /api/v1/users/`
+- **Get User**: `GET /api/v1/users/{user_id}`
 
-### Users Endpoints
+### Dogs API
 
-- **POST /api/v1/users/**: Create a new user profile.
-- **GET /api/v1/users/{user_id}**: Get a specific user profile by user ID.
+- **Create Dog**: `POST /api/v1/dogs/`
+- **Search Dogs**: `GET /api/v1/dogs/`  
+  Supports filtering by:
+  - **Location**: Search for dogs within a specified distance from a location.
+  - **Breed**: Filter by specific dog breed.
+  - **Price Range**: Filter by price range.
 
 ## Models
 
-### Dog Model
-
-- **name**: The name of the dog.
-- **breed**: The breed of the dog.
-- **age_months**: The age of the dog in months.
-- **price**: The price of the dog in Kenyan Shillings.
-- **description**: Optional description of the dog.
-- **location**: Geolocation data (latitude, longitude, city, and county).
-
 ### User Model
 
-- **id**: A unique identifier for the user.
-- **name**: Name of the user.
-- **email**: User's email.
-- **phone**: User's phone number (Kenyan format).
-- **location**: Geolocation data (latitude, longitude, city, and county).
+```json
+{
+  "name": "str",          // 2-50 characters
+  "email": "str",         // Valid email format
+  "phone": "str",         // Valid Kenyan phone number
+  "password": "str",      // Min 8 characters (for creation only)
+  "location": {
+    "latitude": "float",  // Valid Kenya coordinates
+    "longitude": "float", // Valid Kenya coordinates
+    "city": "str",
+    "county": "str"       // Must be valid Kenyan county
+  }
+}
+```
 
-## Configuration
+### Dog Model
 
-The API settings are stored in `app/config/settings.py`, including:
-
-- **APP_NAME**: The name of the application.
-- **APP_VERSION**: The version of the application.
-- **APP_DESCRIPTION**: A brief description of the API.
-- **Kenya's geographic boundaries**: Ensures that only locations within Kenya are used in the API.
+```json
+{
+  "name": "str",          // 1-50 characters
+  "breed": "str",         // Must be from predefined list
+  "age_months": "int",    // 1-240 months
+  "price": "float",       // Greater than 0
+  "description": "str",   // Optional, max 1000 characters
+  "location": {
+    "latitude": "float",  // Valid Kenya coordinates
+    "longitude": "float", // Valid Kenya coordinates
+    "city": "str",
+    "county": "str"       // Must be valid Kenyan county
+  }
+}
+```
 
 ## Database
 
-The API uses SQLAlchemy with SQLite as the database. The database schema includes tables for **users** and **dogs**, and it is automatically created when you start the application.
+- **Uses SQLite** (dogs.db).
+- **Created automatically** on the first run.
+- **Tables**:
+  - **users**: Stores user information.
+  - **dogs**: Stores dog listings.
+  - **Relationships**: One-to-many between users and dogs.
+
+## Features
+
+- **Geolocation**:
+  - Validates coordinates within Kenya.
+  - Supports distance-based search for dogs.
+  - County validation against official Kenyan counties.
+
+- **Data Validation**:
+  - Validates Kenyan phone numbers.
+  - Checks for valid email addresses.
+  - Ensures valid county names for location.
+  - Validates dog breeds from a predefined list.
+  - Ensures price and age ranges for dogs are valid.
+
+- **Search Capabilities**:
+  - Search by **location radius**.
+  - Filter by **breed**.
+  - Filter by **price range**.
+  - Support for **combined filters** (location, breed, price).
+
+## Security Features
+
+- **Password hashing** using bcrypt for secure password storage.
+- **Input validation and sanitization** to protect against malicious inputs.
+- **Error handling** for invalid requests to ensure robust API responses.
 
 ## Contribution
 
 We welcome contributions! Feel free to fork the repository, create a new branch, and submit a pull request with any changes you'd like to propose.
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ```
 
-### Key Details:
-
-- **Installation**: Provides step-by-step instructions on setting up the project locally.
-- **API Documentation**: Direct links to Swagger and ReDoc for interactive API exploration.
-- **Endpoints**: Lists the main API endpoints for dogs and users.
-- **Models**: Describes the Dog and User models, including all necessary fields.
-- **Database**: Mention of SQLite as the backend and automatic database creation on startup.
-
-This should serve as a comprehensive guide for users to get started with the API, interact with the endpoints, and contribute to the project.
