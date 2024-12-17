@@ -110,16 +110,16 @@ Once the server is running, you can access the interactive API documentation at:
 
 ```json
 {
-  "name": "str",          // 1-50 characters
-  "breed": "str",         // Must be from predefined list
-  "age_months": "int",    // 1-240 months
-  "price": "float",       // Greater than 0
-  "description": "str",   // Optional, max 1000 characters
+  "name": "str",          
+  "breed": "str",        
+  "age_months": "int",    
+  "price": "float",       
+  "description": "str",   
   "location": {
-    "latitude": "float",  // Valid Kenya coordinates
-    "longitude": "float", // Valid Kenya coordinates
+    "latitude": "float", 
+    "longitude": "float", 
     "city": "str",
-    "county": "str"       // Must be valid Kenyan county
+    "county": "str"       
   }
 }
 ```
